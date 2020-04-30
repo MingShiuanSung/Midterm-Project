@@ -5,7 +5,7 @@
 
 // The number of labels (without negative)
 
-#define label_num 3
+#define label_num 2
 
 
 struct Config {
@@ -18,64 +18,18 @@ struct Config {
 
   // The number of expected consecutive inferences for each gesture type.
 
-  const int consecutiveInferenceThresholds[label_num] = {5, 1, 50};
+  const int consecutiveInferenceThresholds[label_num] = {10, 2};
 
 
   const char* output_message[label_num] = {
 
-        "RING:\n\r"
+        "forward:\n\r"
 
-        "          *       \n\r"
+        "         ->       \n\r",
 
-        "       *     *    \n\r"
+        "backward:\n\r"
 
-        "     *         *  \n\r"
-
-        "    *           * \n\r"
-
-        "     *         *  \n\r"
-
-        "       *     *    \n\r"
-
-        "          *       \n\r",
-
-        "SLOPE:\n\r"
-
-        "        *        \n\r"
-
-        "       *         \n\r"
-
-        "      *          \n\r"
-
-        "     *           \n\r"
-
-        "    *            \n\r"
-
-        "   *             \n\r"
-
-        "  *              \n\r"
-
-        " * * * * * * * * \n\r",
-
-        "ARROW:\n\r"
-
-        "        *        \n\r"
-
-        "       * *       \n\r"
-
-        "      *   *      \n\r"
-
-        "     *     *      \n\r"
-
-        "    * *   * *     \n\r"
-
-        "        *        \n\r"
-
-        "        *        \n\r"
-
-        "        *        \n\r"
-
-        "        *        \n\r"};
+        "         <-       \n\r"};
 
 };
 
