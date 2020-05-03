@@ -35,12 +35,12 @@
     {
         "module": "[fill]",
         "size": {
-            ".text": 215,
-            ".data": 8,
+            ".text": 219,
+            ".data": 12,
             ".bss": 43,
-            ".text-delta": 0,
+            ".text-delta": -4,
             ".data-delta": 0,
-            ".bss-delta": -8
+            ".bss-delta": 0
         }
     },
     {
@@ -90,12 +90,12 @@
     {
         "module": "main.o",
         "size": {
-            ".text": 1987,
-            ".data": 263,
+            ".text": 1997,
+            ".data": 267,
             ".bss": 8607,
-            ".text-delta": -32,
+            ".text-delta": 118,
             ".data-delta": 0,
-            ".bss-delta": -8
+            ".bss-delta": 0
         }
     },
     {
@@ -104,7 +104,7 @@
             ".text": 56,
             ".data": 0,
             ".bss": 0,
-            ".text-delta": 0,
+            ".text-delta": 34,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -123,10 +123,10 @@
     {
         "module": "mbed-os/events",
         "size": {
-            ".text": 415,
+            ".text": 1513,
             ".data": 0,
             ".bss": 0,
-            ".text-delta": 0,
+            ".text-delta": 394,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -156,10 +156,10 @@
     {
         "module": "mbed-os/rtos",
         "size": {
-            ".text": 9663,
+            ".text": 10103,
             ".data": 168,
             ".bss": 5980,
-            ".text-delta": 0,
+            ".text-delta": 450,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -177,10 +177,10 @@
     },
     {
         "summary": {
-            "static_ram": 20008,
-            "static_ram_delta": -16,
-            "total_flash": 80254,
-            "total_flash_delta": -32
+            "static_ram": 20016,
+            "static_ram_delta": 0,
+            "total_flash": 81814,
+            "total_flash_delta": 992
         }
     }
 ]

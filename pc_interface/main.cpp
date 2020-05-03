@@ -25,7 +25,7 @@ int16_t waveform[kAudioTxBufferSize];
 
 // interface
 int mod_sel = 2;
-int song_sel = 0;
+int song_sel = 1;
 bool flag_song = true;
 bool flag_mode = true;
 
@@ -48,10 +48,7 @@ bool flag = true;
 // functions declaration
 void loadMusic(void);
 void playNote(int freq);
-//void loadMusicHandler(void);
 void playMusic(void);
-//void playMusicHandler(void);
-//void stopPlayMusic(void);
 void uLCD_mode(void);
 void uLCD_song(void);
 void clearBuffer(void);
@@ -65,15 +62,14 @@ int main(void)
   green_led = 1;
 
 
-  //t.start(callback(&queue, &EventQueue::dispatch_forever));
+  t.start(callback(&queue, &EventQueue::dispatch_forever));
 
   //sw2.rise(queue.event(loadMusicHandler));
 
   //sw3.rise(queue.event(playMusicHandler));
 
   //sw3.fall(queue.event(stopPlayMusic));
-
-  t.start(playMusic);
+  
 
   while (1) // main program loop
   {
@@ -179,6 +175,11 @@ void loadMusic(void)
 
   audio.spk.pause();
 
+  //t.terminate();
+
+  queue.cancel(idC);
+
+  serialCount = 0;
 
   while(serialCount < nameLength) // get name
   {
@@ -294,6 +295,13 @@ void loadMusic(void)
     }
 
   }
+  wait(1.0);
+
+  idC = queue.call_every(noteNum, playMusic);
+
+  //t.start(playMusic);
+
+  //t.join();
 
   green_led = 1;
 
@@ -325,24 +333,25 @@ void playNote(int freq)
 
 void playMusic(void) 
 {
+  while(1)
 
-  for(int i = 0; i < noteNum; i++)
-
-  {
-
-    int length = noteLength[i];
-
-    while(length--)
+    for(int i = 0; i < noteNum; i++)
 
     {
 
-      playNote(note[i]);
+      int length = noteLength[i];
 
-      if(length <= 1) wait(1.0);
+      while(length--)
+
+      {
+
+        playNote(note[i]);
+
+        if(length <= 1) wait(1.0);
+
+      }
 
     }
-
-  }
 
 }
 
