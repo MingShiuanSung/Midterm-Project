@@ -35,10 +35,10 @@
     {
         "module": "[fill]",
         "size": {
-            ".text": 294,
+            ".text": 286,
             ".data": 14,
             ".bss": 50,
-            ".text-delta": 0,
+            ".text-delta": -6,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -112,10 +112,10 @@
     {
         "module": "main.o",
         "size": {
-            ".text": 3250,
+            ".text": 3116,
             ".data": 295,
             ".bss": 8918,
-            ".text-delta": 0,
+            ".text-delta": -202,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -123,7 +123,7 @@
     {
         "module": "mbed-os/components",
         "size": {
-            ".text": 50,
+            ".text": 16,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -145,7 +145,7 @@
     {
         "module": "mbed-os/events",
         "size": {
-            ".text": 1273,
+            ".text": 771,
             ".data": 0,
             ".bss": 0,
             ".text-delta": 0,
@@ -178,7 +178,7 @@
     {
         "module": "mbed-os/rtos",
         "size": {
-            ".text": 10103,
+            ".text": 9653,
             ".data": 168,
             ".bss": 5980,
             ".text-delta": 0,
@@ -234,8 +234,8 @@
         "summary": {
             "static_ram": 22528,
             "static_ram_delta": 0,
-            "total_flash": 127423,
-            "total_flash_delta": 0
+            "total_flash": 126295,
+            "total_flash_delta": -208
         }
     }
 ]

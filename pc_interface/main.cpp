@@ -73,18 +73,17 @@ void clearBuffer(void);
 void showMusic(void);
 int STOI(char *, int);
 int PredictGesture(float*);
+void Predict_init(void);
 void Predict(void);
-
 
 
 int main(void)
 {
   green_led = 1;
 
+  //t.start(callback(&queue, &EventQueue::dispatch_forever));
 
-  t.start(callback(&queue, &EventQueue::dispatch_forever));
-  
-  queue.call(Predict);
+  Predict();
 
   while (1) // main program loop
   {
@@ -95,6 +94,7 @@ int main(void)
     song_sel_enable = false; // DNL
 
     uLCD_mode();
+
 
     if (mod_sel == 0 && Switch == 0)
     {
@@ -119,6 +119,7 @@ int main(void)
       mod_sel_enable = false; // DNL
 
       song_sel_enable = true; // DNL
+
 
       if (flag)
         pc.printf("read song list\r\n"); // write string to python
@@ -483,6 +484,7 @@ int STOI(char * buffer, int len)
   return atoi(replica);
 }
 
+
 // Return the result of the last prediction
 
 int PredictGesture(float* output) {
@@ -556,8 +558,11 @@ int PredictGesture(float* output) {
 
 }
 
-void Predict(void) {
 
+
+
+void Predict(void)
+{
 
   // Create an area of memory to use for input, output, and intermediate arrays.
 
@@ -697,8 +702,8 @@ void Predict(void) {
   error_reporter->Report("Set up successful...\n");
 
 
-  while (true) {
-
+  while (true) 
+  {
 
     // Attempt to read new data from the accelerometer
 
