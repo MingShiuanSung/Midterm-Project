@@ -28,6 +28,7 @@ int mod_sel = 2;
 int song_sel = 1;
 bool flag_song = true;
 bool flag_mode = true;
+bool flag_pause = false;
 
 
 // music data
@@ -63,12 +64,6 @@ int main(void)
 
 
   t.start(callback(&queue, &EventQueue::dispatch_forever));
-
-  //sw2.rise(queue.event(loadMusicHandler));
-
-  //sw3.rise(queue.event(playMusicHandler));
-
-  //sw3.fall(queue.event(stopPlayMusic));
   
 
   while (1) // main program loop
@@ -175,11 +170,9 @@ void loadMusic(void)
 
   audio.spk.pause();
 
-  //t.terminate();
-
-  queue.cancel(idC);
-
   serialCount = 0;
+
+  flag_pause = true;
 
   while(serialCount < nameLength) // get name
   {
@@ -297,11 +290,9 @@ void loadMusic(void)
   }
   wait(1.0);
 
-  idC = queue.call_every(noteNum, playMusic);
+  flag_pause = false;
 
-  //t.start(playMusic);
-
-  //t.join();
+  queue.call(playMusic);
 
   green_led = 1;
 
@@ -333,25 +324,24 @@ void playNote(int freq)
 
 void playMusic(void) 
 {
-  while(1)
 
-    for(int i = 0; i < noteNum; i++)
+  for(int i = 0; i < noteNum & !flag_pause; i++)
+  {
+
+    int length = noteLength[i];
+
+    while(length-- & !flag_pause)
 
     {
 
-      int length = noteLength[i];
+      playNote(note[i]);
 
-      while(length--)
-
-      {
-
-        playNote(note[i]);
-
-        if(length <= 1) wait(1.0);
-
-      }
+      if(length <= 1) wait(1.0);
 
     }
+
+  }
+
 
 }
 
