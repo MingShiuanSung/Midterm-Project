@@ -1,0 +1,19 @@
+BUILD/K66F/GCC_ARM-AUDIO/New/tensorflowlite_mbed/tensorflow/lite/micro/kernels/strided_slice.o: \
+ New/tensorflowlite_mbed/tensorflow/lite/micro/kernels/strided_slice.cc \
+ BUILD/K66F/GCC_ARM-AUDIO/mbed_config.h \
+ New/tensorflowlite_mbed/tensorflow/lite/kernels/internal/reference/strided_slice.h \
+ New/tensorflowlite_mbed/tensorflow/lite/kernels/internal/common.h \
+ New/tensorflowlite_mbed/third_party/gemmlowp/fixedpoint/fixedpoint.h \
+ New/tensorflowlite_mbed/third_party/gemmlowp/fixedpoint/../internal/detect_platform.h \
+ New/tensorflowlite_mbed/tensorflow/lite/kernels/internal/optimized/neon_check.h \
+ New/tensorflowlite_mbed/tensorflow/lite/kernels/internal/types.h \
+ New/tensorflowlite_mbed/tensorflow/lite/kernels/internal/compatibility.h \
+ New/tensorflowlite_mbed/tensorflow/lite/kernels/op_macros.h \
+ New/tensorflowlite_mbed/tensorflow/lite/kernels/internal/strided_slice_logic.h \
+ New/tensorflowlite_mbed/tensorflow/lite/c/builtin_op_data.h \
+ New/tensorflowlite_mbed/tensorflow/lite/c/common.h \
+ New/tensorflowlite_mbed/tensorflow/lite/kernels/internal/tensor_ctypes.h \
+ New/tensorflowlite_mbed/tensorflow/lite/kernels/kernel_util.h \
+ New/tensorflowlite_mbed/third_party/flatbuffers/include/flatbuffers/flatbuffers.h \
+ New/tensorflowlite_mbed/third_party/flatbuffers/include/flatbuffers/base.h \
+ New/tensorflowlite_mbed/third_party/flatbuffers/include/flatbuffers/stl_emulation.h
