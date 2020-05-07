@@ -29,7 +29,7 @@ DigitalOut green_led(LED2);;
 DigitalIn  Switch(SW3);
 uLCD_4DGL uLCD(D1, D0, D2);
 EventQueue queue(32 * EVENTS_EVENT_SIZE);
-Thread t;
+Thread t, t1;
 int idC = 0;
 int16_t waveform[kAudioTxBufferSize];
 
@@ -81,9 +81,9 @@ int main(void)
 {
   green_led = 1;
 
-  //t.start(callback(&queue, &EventQueue::dispatch_forever));
+  t.start(callback(&queue, &EventQueue::dispatch_forever));
 
-  Predict();
+  t1.start(Predict);
 
   while (1) // main program loop
   {
@@ -570,7 +570,7 @@ void Predict(void)
 
   // determined by experimentation.
 
-  constexpr int kTensorArenaSize = 60 * 1024;
+  constexpr int kTensorArenaSize = 20 * 1024;  // originally 60 * 1024
 
   uint8_t tensor_arena[kTensorArenaSize];
 
@@ -610,7 +610,8 @@ void Predict(void)
 
         model->version(), TFLITE_SCHEMA_VERSION);
 
-    return -1;
+    //return -1;
+    return;
 
   }
 
@@ -626,6 +627,7 @@ void Predict(void)
   // needed by this graph.
 
   static tflite::MicroOpResolver<6> micro_op_resolver;
+
 
   micro_op_resolver.AddBuiltin(
 
@@ -651,6 +653,7 @@ void Predict(void)
 
   micro_op_resolver.AddBuiltin(tflite::BuiltinOperator_RESHAPE,
                                tflite::ops::micro::Register_RESHAPE(), 1);
+
 
   // Build an interpreter to run the model with
 
@@ -680,7 +683,8 @@ void Predict(void)
 
     error_reporter->Report("Bad input tensor parameters in model");
 
-    return -1;
+    //return -1;
+    return;
 
   }
 
@@ -694,12 +698,13 @@ void Predict(void)
 
     error_reporter->Report("Set up failed\n");
 
-    return -1;
+    //return -1;
+    return;
 
   }
 
 
-  error_reporter->Report("Set up successful...\n");
+ //  error_reporter->Report("Set up successful...\n");
 
 
   while (true) 
@@ -768,8 +773,11 @@ void Predict(void)
         else if (gesture_index == 1)
           --song_sel;
       }
-      
 
+      if (mod_sel == 3) mod_sel = 0; // barreling
+
+      if (mod_sel == -1) mod_sel = 2; // barreling
+      
     }
 
   }
