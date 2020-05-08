@@ -43,6 +43,7 @@ bool song_sel_enable = false;
 bool flag_song = true;
 bool flag_mode = true;
 bool flag_audio_stop = false;
+bool flag_loading = false;
 int cnt = 0;
 
 
@@ -88,7 +89,6 @@ int main(void)
   t1.start(Predict);
 
 
-
   while (1) // main program loop
   {
     // mode selection
@@ -96,6 +96,8 @@ int main(void)
     mod_sel_enable = true; // DNL
 
     song_sel_enable = false; // DNL
+
+    song_sel = 0;
 
     uLCD_mode();
 
@@ -124,6 +126,7 @@ int main(void)
 
       song_sel_enable = true; // DNL
 
+      song_sel = 0;
 
       if (flag)
         pc.printf("read song list\r\n"); // write string to python
@@ -186,10 +189,11 @@ int main(void)
         {
           pc.printf("%s\r\n", songList[song_sel]); // write song name to python
 
-
           //---load music---
 
           flag_audio_stop = true;
+
+          flag_loading = true;
 
           loadMusic();
 
@@ -197,10 +201,13 @@ int main(void)
 
           flag_audio_stop = false;
 
+          flag_loading = false;
+
           queue.call(playMusic);
 
           //---load music---
-
+          
+          mod_sel = 0;
 
           flag = false;
 
@@ -715,6 +722,7 @@ void Predict(void)
 
   while (true) 
   {
+    if (flag_loading) wait(2.0);
 
     // Attempt to read new data from the accelerometer
 

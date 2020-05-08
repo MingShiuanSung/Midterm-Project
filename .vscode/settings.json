@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "ratio": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "condition_variable": "cpp"
     }
 }
