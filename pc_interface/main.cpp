@@ -29,15 +29,16 @@ DigitalOut green_led(LED2);;
 DigitalIn  Switch(SW3);
 uLCD_4DGL uLCD(D1, D0, D2);
 EventQueue queue(32 * EVENTS_EVENT_SIZE);
-Thread t, t1;
+Thread t;
+Thread t1(osPriorityNormal, 120 * 1024 /*120K stack size*/);
 int idC = 0;
 int16_t waveform[kAudioTxBufferSize];
 
 
 // interface
-int mod_sel = 2;
+int mod_sel = 0;
 bool mod_sel_enable = false;
-int song_sel = 1;
+int song_sel = 0;
 bool song_sel_enable = false;
 bool flag_song = true;
 bool flag_mode = true;
@@ -77,6 +78,7 @@ void Predict_init(void);
 void Predict(void);
 
 
+
 int main(void)
 {
   green_led = 1;
@@ -84,6 +86,8 @@ int main(void)
   t.start(callback(&queue, &EventQueue::dispatch_forever));
 
   t1.start(Predict);
+
+
 
   while (1) // main program loop
   {
@@ -189,7 +193,7 @@ int main(void)
 
           loadMusic();
 
-          wait(1.0);
+          wait(2.0);
 
           flag_audio_stop = false;
 
@@ -570,7 +574,7 @@ void Predict(void)
 
   // determined by experimentation.
 
-  constexpr int kTensorArenaSize = 20 * 1024;  // originally 60 * 1024
+  constexpr int kTensorArenaSize = 60 * 1024;  
 
   uint8_t tensor_arena[kTensorArenaSize];
 
@@ -610,7 +614,7 @@ void Predict(void)
 
         model->version(), TFLITE_SCHEMA_VERSION);
 
-    //return -1;
+    
     return;
 
   }
@@ -683,7 +687,7 @@ void Predict(void)
 
     error_reporter->Report("Bad input tensor parameters in model");
 
-    //return -1;
+    
     return;
 
   }
@@ -698,13 +702,15 @@ void Predict(void)
 
     error_reporter->Report("Set up failed\n");
 
-    //return -1;
+    
     return;
 
   }
 
 
- //  error_reporter->Report("Set up successful...\n");
+  error_reporter->Report("Set up successful...\n");
+
+
 
 
   while (true) 
@@ -777,8 +783,13 @@ void Predict(void)
       if (mod_sel == 3) mod_sel = 0; // barreling
 
       if (mod_sel == -1) mod_sel = 2; // barreling
+
+      if (song_sel == listLength) song_sel = 0; // barreling
+
+      if (song_sel == -1) song_sel = listLength - 1; // barreling
       
     }
+
 
   }
 
