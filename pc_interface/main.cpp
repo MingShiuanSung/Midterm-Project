@@ -414,11 +414,11 @@ void uLCD_mode()
 
   uLCD.printf("\n   1. forward\n");
 
-  uLCD.locate(1, 3);
+  uLCD.locate(1, 4);
 
   uLCD.printf("\n   2. backward\n");
 
-  uLCD.locate(1, 4);
+  uLCD.locate(1, 6);
 
   uLCD.printf("\n   3. change song\n");
 
@@ -430,7 +430,7 @@ void uLCD_mode()
 
   uLCD.printf("\n%s\n", name);
 
-  uLCD.locate(1, mod_sel + 3);
+  uLCD.locate(1, 2 * mod_sel + 3);
 
   uLCD.printf("->");
 
@@ -453,7 +453,8 @@ void uLCD_song()
 
   uLCD.printf("%s", songList[song_sel]);
 
-  uLCD.printf("                   ");  //  clear the screen
+  uLCD.printf("                   "
+              "                   ");  //  clear the screen
 
   flag_mode = true; 
 
