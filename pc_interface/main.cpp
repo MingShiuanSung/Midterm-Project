@@ -445,21 +445,15 @@ void uLCD_song()
     flag_song = false;
   }
 
-  uLCD.locate(1, 2);
+  uLCD.locate(1, 5);
 
-  uLCD.printf("\n   1. %s\n", songList[0]);
+  uLCD.printf("  select a song:");
 
-  uLCD.locate(1, 4);
+  uLCD.locate(1, 7);
 
-  uLCD.printf("\n   2. %s\n", songList[1]);
+  uLCD.printf("%s", songList[song_sel]);
 
-  uLCD.locate(1, 6);
-
-  uLCD.printf("\n   3. %s\n", songList[2]);
-
-  uLCD.locate(1, song_sel * 2 + 3);
-
-  uLCD.printf("->");
+  uLCD.printf("                   ");  //  clear the screen
 
   flag_mode = true; 
 
