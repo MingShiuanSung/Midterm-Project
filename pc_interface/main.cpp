@@ -16,6 +16,60 @@
 #include "tensorflow/lite/version.h"
 //------------DNL----------------------
 
+//------------tilt---------------------
+#include "fsl_port.h"
+
+#include "fsl_gpio.h"
+
+#define UINT14_MAX        16383
+
+// FXOS8700CQ I2C address
+
+#define FXOS8700CQ_SLAVE_ADDR0 (0x1E<<1) // with pins SA0=0, SA1=0
+
+#define FXOS8700CQ_SLAVE_ADDR1 (0x1D<<1) // with pins SA0=1, SA1=0
+
+#define FXOS8700CQ_SLAVE_ADDR2 (0x1C<<1) // with pins SA0=0, SA1=1
+
+#define FXOS8700CQ_SLAVE_ADDR3 (0x1F<<1) // with pins SA0=1, SA1=1
+
+// FXOS8700CQ internal register addresses
+
+#define FXOS8700Q_STATUS 0x00
+
+#define FXOS8700Q_OUT_X_MSB 0x01
+
+#define FXOS8700Q_OUT_Y_MSB 0x03
+
+#define FXOS8700Q_OUT_Z_MSB 0x05
+
+#define FXOS8700Q_M_OUT_X_MSB 0x33
+
+#define FXOS8700Q_M_OUT_Y_MSB 0x35
+
+#define FXOS8700Q_M_OUT_Z_MSB 0x37
+
+#define FXOS8700Q_WHOAMI 0x0D
+
+#define FXOS8700Q_XYZ_DATA_CFG 0x0E
+
+#define FXOS8700Q_CTRL_REG1 0x2A
+
+#define FXOS8700Q_M_CTRL_REG1 0x5B
+
+#define FXOS8700Q_M_CTRL_REG2 0x5C
+
+#define FXOS8700Q_WHOAMI_VAL 0xC7
+
+I2C i2c1( PTD9,PTD8);
+
+int m_addr = FXOS8700CQ_SLAVE_ADDR1;
+
+void FXOS8700CQ_readRegs1(int addr, uint8_t * data, int len);
+
+void FXOS8700CQ_writeRegs1(uint8_t * data, int len);
+//------------tilt---------------------
+
 
 #define bufferLength (32)
 #define musiclLength (100)
@@ -43,7 +97,6 @@ bool song_sel_enable = false;
 bool flag_song = true;
 bool flag_mode = true;
 bool flag_audio_stop = false;
-bool flag_loading = false;
 int cnt = 0;
 
 
@@ -61,7 +114,8 @@ int noteLength[musiclLength];
 char songList[listMaxLength][nameLength];
 int listLength = 0;
 bool flag = true;
-
+float magnitude_x = 0;
+float magnitude_y = 0;
 
 
 
@@ -71,12 +125,14 @@ void playNote(int freq);
 void playMusic(void);
 void uLCD_mode(void);
 void uLCD_song(void);
+void uLCD_Taiko(void);
 void clearBuffer(void);
 void showMusic(void);
 int STOI(char *, int);
 int PredictGesture(float*);
 void Predict_init(void);
 void Predict(void);
+bool beat_capture(void);
 
 
 
@@ -187,21 +243,19 @@ int main(void)
 
         if (Switch == 0)
         {
+          pc.baud(9600);
+
           pc.printf("%s\r\n", songList[song_sel]); // write song name to python
 
           //---load music---
 
           flag_audio_stop = true;
 
-          flag_loading = true;
-
           loadMusic();
 
           wait(2.0);
 
           flag_audio_stop = false;
-
-          flag_loading = false;
 
           queue.call(playMusic);
 
@@ -218,6 +272,28 @@ int main(void)
       }
       
 
+    }
+    else if (mod_sel == 3 && Switch == 0)
+    {
+      // Taiko game mode
+      // if the next note is higher than the current note, then the beat is strong
+      // if the next note is lower than the current note, then the beat is weak
+      // if the next note is same as the current note, then the beat is the same
+
+      uLCD.cls();
+
+      flag_audio_stop = true;
+
+      wait(1.0);
+
+      flag_audio_stop = false;
+
+      queue.call(playMusic);
+
+      uLCD_Taiko();
+
+      flag_mode = true;
+      
     }
 
   }
@@ -424,9 +500,13 @@ void uLCD_mode()
 
   uLCD.locate(1, 8);
 
+  uLCD.printf("\n   4. Taiko game\n");
+
+  uLCD.locate(1, 10);
+
   uLCD.printf("\n  Current song : \n");
 
-  uLCD.locate(1, 9);
+  uLCD.locate(1, 11);
 
   uLCD.printf("\n%s\n", name);
 
@@ -457,6 +537,53 @@ void uLCD_song()
               "                   ");  //  clear the screen
 
   flag_mode = true; 
+
+}
+
+void uLCD_Taiko(void)
+{
+  uLCD.locate(1, 5);
+
+  uLCD.printf("  next note:");
+
+  bool beat = false;
+
+  float score = 0; // ranging from 0 to 10
+
+  while (cnt < noteNum)
+  {
+    uLCD.locate(1, 6);
+
+    if (note[cnt + 1] > note[cnt])
+      beat = true;
+    else if (note[cnt + 1] < note[cnt])
+      beat = false;
+    
+    if (beat)
+      uLCD.printf("  strong");
+    else
+      uLCD.printf("  weak  ");
+
+    uLCD.printf("\n    %f", magnitude_x);
+
+    uLCD.printf("\n    %f", magnitude_y);
+    
+
+    if (beat == beat_capture())
+      score++;
+  }
+
+  // show score for 2 sec. then back to main menu
+
+  uLCD.cls();
+
+  uLCD.locate(1, 5);
+
+  uLCD.printf("  total score:\n     %d", int(score / noteNum * 10));
+
+  wait(2.0);
+  
+  mod_sel = 0;
 
 }
 
@@ -717,7 +844,7 @@ void Predict(void)
 
   while (true) 
   {
-    if (flag_loading) wait(2.0);
+    if (flag_audio_stop) wait(2.0);
 
     // Attempt to read new data from the accelerometer
 
@@ -783,9 +910,9 @@ void Predict(void)
           --song_sel;
       }
 
-      if (mod_sel == 3) mod_sel = 0; // barreling
+      if (mod_sel == 4) mod_sel = 0; // barreling
 
-      if (mod_sel == -1) mod_sel = 2; // barreling
+      if (mod_sel == -1) mod_sel = 3; // barreling
 
       if (song_sel == listLength) song_sel = 0; // barreling
 
@@ -797,4 +924,96 @@ void Predict(void)
   }
 
 }
+
+bool beat_capture(void)
+{
+
+  pc.baud(115200);
+
+
+  uint8_t who_am_i, data[2], res[6];
+
+  int16_t acc16;
+
+  float t[3];
+
+
+  // Enable the FXOS8700Q
+
+
+  FXOS8700CQ_readRegs1( FXOS8700Q_CTRL_REG1, &data[1], 1);
+
+  data[1] |= 0x01;
+
+  data[0] = FXOS8700Q_CTRL_REG1;
+
+  FXOS8700CQ_writeRegs1(data, 2);
+
+
+  // Get the slave address
+
+  FXOS8700CQ_readRegs1(FXOS8700Q_WHOAMI, &who_am_i, 1);
+
+
+
+
+// while true
+
+    FXOS8700CQ_readRegs1(FXOS8700Q_OUT_X_MSB, res, 6);
+
+
+    acc16 = (res[0] << 6) | (res[1] >> 2);
+
+    if (acc16 > UINT14_MAX/2)
+
+        acc16 -= UINT14_MAX;
+
+    t[0] = ((float)acc16) / 4096.0f;
+
+
+    acc16 = (res[2] << 6) | (res[3] >> 2);
+
+    if (acc16 > UINT14_MAX/2)
+
+        acc16 -= UINT14_MAX;
+
+    t[1] = ((float)acc16) / 4096.0f;
+
+
+    acc16 = (res[4] << 6) | (res[5] >> 2);
+
+    if (acc16 > UINT14_MAX/2)
+
+        acc16 -= UINT14_MAX;
+
+    t[2] = ((float)acc16) / 4096.0f;
+
+    magnitude_x = t[0];
+
+    magnitude_y = t[1];
+
+    if (t[0] > 0.75 || t[1] > 0.75 || t[0] < -0.75 || t[1] < -0.75) return true;
+    else return false;
+
+
+}
+
+
+void FXOS8700CQ_readRegs1(int addr, uint8_t * data, int len) {
+
+  char t = addr;
+
+  i2c1.write(m_addr, &t, 1, true);
+
+  i2c1.read(m_addr, (char *)data, len);
+
+}
+
+
+void FXOS8700CQ_writeRegs1(uint8_t * data, int len) {
+
+  i2c1.write(m_addr, (char *)data, len);
+
+}
+
 
